@@ -42,20 +42,20 @@ namespace SmtsBusiness {
 				smrate.unit_price = unit_price;
 			});
 
-			action{
-				permission_level{issuer,"active"_n},
+			action {
+				permission_level {issuer,"active"_n},
 				// account that owns the contract. In this case, the name of the contract == name of the account
 				_self,
 				"issue"_n,
 				std::make_tuple(issuer, max_supply, std::string{"Created Tokens Issued to Token Owner"})	
 			}.send();
-		} 
-		/* else {
+
+		}  else {
 			// update
 			commUnitPrices.modify(existing_smrts_iter, issuer, [&](auto& smrate) {
 				smrate.unit_price = unit_price;
 			});
-		}*/
+		}
 	}
 
 	// Define new configuration for a new asset
@@ -71,7 +71,7 @@ namespace SmtsBusiness {
 		eosio_assert(existing == assetStats.end(), "token with symbol already exists");
 
 		// create a new asset
-		assetStats.emplace(_self, [&](auto& s ) {
+		assetStats.emplace(_self, [&](auto& s) {
 		   s.supply.symbol = max_supply.symbol;
 		   s.max_supply    = max_supply;
 		   s.issuer        = issuer;
@@ -257,6 +257,13 @@ namespace SmtsBusiness {
 
 		while(itr2 != st2.end()){
 			itr2 = st2.erase(itr2);
+		}
+
+		CommodityUnitPrices commUnitPrices(_self, "eosyeloserik"_n.value);
+		auto itr3 = commUnitPrices.begin();
+
+		while(itr3 != commUnitPrices.end()){
+			itr3 = commUnitPrices.erase(itr3);
 		}
 	}
 }
