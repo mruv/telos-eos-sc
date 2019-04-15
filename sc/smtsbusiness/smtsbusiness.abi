@@ -136,7 +136,7 @@
                 },
                 {
                     "name": "status",
-                    "type": "IrStatus"
+                    "type": "string"
                 }
             ]
         },

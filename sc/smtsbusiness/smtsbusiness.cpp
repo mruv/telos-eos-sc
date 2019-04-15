@@ -11,6 +11,13 @@ namespace SmtsBusiness {
 		asset yelos = {0, symbol{"YELOS", 4}};
 		eosio_assert(yelos.symbol.code().raw() == max_supply.symbol.code().raw(), "YELOS is the contract's only currency / token");
 		Create(_self, max_supply);
+		action {
+			permission_level{_self,"active"_n},
+			// account that owns the contract. In this case, the name of the contract == name of the account
+			_self,
+			"issue"_n,
+			std::make_tuple(_self, max_supply, "Created Tokens Issued to Token Owner")	
+		}.send();
 	}
 
 	void SmtsBusiness::CreateCmmdty(const name& issuer, const asset& max_supply, const asset& unit_price) {
@@ -177,7 +184,7 @@ namespace SmtsBusiness {
 			req.to         = to;
 			req.unit_price = existing_comm_prcs_iter.unit_price;
 			req.quantity   = quantity;
-			req.status     = IrStatus::PENDING;
+			req.status     = "PENDING";
 		});
 	}
 
@@ -199,7 +206,7 @@ namespace SmtsBusiness {
 		}.send();
 
 		invRequests.modify(inv_req, merchant_acct, [&](auto& req) {
-			req.status = IrStatus::FULFILLED;
+			req.status = "FULFILLED";
 		});
 	}
 

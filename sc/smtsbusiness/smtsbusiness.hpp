@@ -21,7 +21,7 @@ using eosio::symbol_code;
 namespace SmtsBusiness {
 
 	// Inventory Request Status
-	enum class IrStatus : uint8_t { PENDING = 0, FULFILLED = 1, PAID = 2 };
+	// enum class IrStatus : uint8_t { PENDING = 0, FULFILLED = 1, PAID = 2 };
 
 	class [[eosio::contract("smtsbusiness")]] SmtsBusiness : public contract {
 
@@ -47,6 +47,7 @@ namespace SmtsBusiness {
 			// INVENTORY
 
 		private:
+			
 			// A data structure that defines the amount / quantity of an asset held by
 			// a single account.
 			struct [[eosio::table("account")]] Account {
@@ -74,12 +75,12 @@ namespace SmtsBusiness {
 			};
 
 			struct [[eosio::table("inventoryreq")]] InventoryReq {
-				uint64_t id;
-				name     from;
-				name     to;
-				asset    quantity;
-				asset    unit_price;
-				IrStatus status;
+				uint64_t    id;
+				name        from;
+				name        to;
+				asset       quantity;
+				asset       unit_price;
+				std::string status;
 
 				uint64_t primary_key() const { return id; }
 			};
