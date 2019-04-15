@@ -82,7 +82,7 @@ namespace SmtsBusiness {
 	    eosio_assert(quantity.symbol == existing->supply.symbol, "symbol precision mismatch");
 	    eosio_assert(quantity.amount <= existing->max_supply.amount - existing->supply.amount, "quantity exceeds available supply");
 
-	    tokenStats.modify(*existing, existing->issuer, [&]( auto& s) {
+	    tokenStats.modify(*existing, existing->issuer, [&](auto& s) {
 	       s.supply += quantity;
 	    });
 
@@ -136,11 +136,11 @@ namespace SmtsBusiness {
 			// this only happens when the account 'to' is receiving the asset for the
 			// first time.
 			// to == from
-			accounts.emplace(payer, [&]( auto& a ) {
+			accounts.emplace(payer, [&](auto& a ) {
 				a.balance = value;
 			});
 		} else {
-			accounts.modify(rcvr_acc, payer, [&]( auto& a ) {
+			accounts.modify(rcvr_acc, payer, [&](auto& a ) {
 				a.balance += value;
 			});
 		}
@@ -182,11 +182,30 @@ namespace SmtsBusiness {
 	}
 
 	void SmtsBusiness::Fulfill(const name& merchant_acct, uint64_t ir_id) {
-		
+
+		require_auth(merchant_acct);
+
+		InventoryReqs invRequests(_self, _self.value);
+		const auto& inv_req = invRequests.get(ir_id, "Fulfill Requests that exist only");
+
+		// An inventory request is fulfilled by transfering some specified amount of Tokens from 
+		// one acct to another
+		action{
+			permission_level{inv_req.to, "active"_n},
+			// account that owns the contract. In this case, the name of the contract == name of the account
+			_self,
+			"transfer"_n,
+			std::make_tuple(inv_req.to, inv_req.from, inv_req.quantity, "Inv Req fulfilled")
+		}.send();
+
+		invRequests.modify(inv_req, merchant_acct, [&](auto& req) {
+			req.status = IrStatus::FULFILLED;
+		});
 	}
 
 	void SmtsBusiness::Pay(const name& customer_acct, uint64_t ir_id) {
 
+		require_auth(customer_acct);
 	}
 
 	void SmtsBusiness::DeleteData() {

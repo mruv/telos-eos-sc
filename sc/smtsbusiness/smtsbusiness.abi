@@ -79,6 +79,38 @@
             "fields": []
         },
         {
+            "name": "Fulfill",
+            "base": "",
+            "fields": [
+                {
+                    "name": "merchant_acct",
+                    "type": "name"
+                },
+                {
+                    "name": "ir_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "InvRequest",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "InventoryReq",
             "base": "",
             "fields": [
@@ -101,6 +133,10 @@
                 {
                     "name": "unit_price",
                     "type": "asset"
+                },
+                {
+                    "name": "status",
+                    "type": "IrStatus"
                 }
             ]
         },
@@ -119,6 +155,20 @@
                 {
                     "name": "memo",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "Pay",
+            "base": "",
+            "fields": [
+                {
+                    "name": "customer_acct",
+                    "type": "name"
+                },
+                {
+                    "name": "ir_id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -162,8 +212,23 @@
             "ricardian_contract": ""
         },
         {
+            "name": "fulfill",
+            "type": "Fulfill",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "inventoryreq",
+            "type": "InvRequest",
+            "ricardian_contract": ""
+        },
+        {
             "name": "issue",
             "type": "Issue",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pay",
+            "type": "Pay",
             "ricardian_contract": ""
         },
         {
