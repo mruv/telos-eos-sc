@@ -181,6 +181,14 @@ namespace SmtsBusiness {
 		});
 	}
 
+	void SmtsBusiness::Fulfill(const name& merchant_acct, uint64_t ir_id) {
+		
+	}
+
+	void SmtsBusiness::Pay(const name& customer_acct, uint64_t ir_id) {
+
+	}
+
 	void SmtsBusiness::DeleteData() {
 
 		require_auth(_self);
