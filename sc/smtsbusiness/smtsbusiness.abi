@@ -58,7 +58,7 @@
                     "type": "asset"
                 },
                 {
-                    "name": "yelos_per_lbs",
+                    "name": "unit_price",
                     "type": "asset"
                 }
             ]

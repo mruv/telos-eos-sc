@@ -1,7 +1,7 @@
 ECPP=eosio-cpp
 ARGS=-w --abigen -I ./
 
-build:
+build: clean
 	$(ECPP) $(ARGS) -o smtsbusiness.wasm smtsbusiness.cpp
 
 clean:

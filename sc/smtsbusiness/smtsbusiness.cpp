@@ -11,12 +11,13 @@ namespace SmtsBusiness {
 		asset yelos = {0, symbol{"YELOS", 4}};
 		eosio_assert(yelos.symbol.code().raw() == max_supply.symbol.code().raw(), "YELOS is the contract's only currency / token");
 		Create(_self, max_supply);
-		action {
+
+		action{
 			permission_level{_self,"active"_n},
 			// account that owns the contract. In this case, the name of the contract == name of the account
 			_self,
 			"issue"_n,
-			std::make_tuple(_self, max_supply, "Created Tokens Issued to Token Owner")	
+			std::make_tuple(_self, max_supply, std::string{"Created Tokens Issued to Token Owner"})	
 		}.send();
 	}
 
@@ -37,15 +38,24 @@ namespace SmtsBusiness {
 		if (existing_smrts_iter == commUnitPrices.end()) {
 			// create new
 			commUnitPrices.emplace(issuer, [&](auto& smrate) {
-				smrate.comm_name = max_supply.symbol.code();
+				smrate.comm_name  = max_supply.symbol.code();
 				smrate.unit_price = unit_price;
 			});
-		} else {
+
+			action{
+				permission_level{issuer,"active"_n},
+				// account that owns the contract. In this case, the name of the contract == name of the account
+				_self,
+				"issue"_n,
+				std::make_tuple(issuer, max_supply, std::string{"Created Tokens Issued to Token Owner"})	
+			}.send();
+		} 
+		/* else {
 			// update
 			commUnitPrices.modify(existing_smrts_iter, issuer, [&](auto& smrate) {
 				smrate.unit_price = unit_price;
 			});
-		}
+		}*/
 	}
 
 	// Define new configuration for a new asset
@@ -83,8 +93,8 @@ namespace SmtsBusiness {
 
 	    // An asset can only be Issued by the creator.
 	    require_auth(existing->issuer);
-	    eosio_assert(quantity.is_valid(), "invalid quantity" );
-	    eosio_assert(quantity.amount > 0, "must Issue positive quantity" );
+	    eosio_assert(quantity.is_valid(), "invalid quantity");
+	    eosio_assert(quantity.amount > 0, "must Issue positive quantity");
 
 	    eosio_assert(quantity.symbol == existing->supply.symbol, "symbol precision mismatch");
 	    eosio_assert(quantity.amount <= existing->max_supply.amount - existing->supply.amount, "quantity exceeds available supply");
@@ -202,7 +212,7 @@ namespace SmtsBusiness {
 			// account that owns the contract. In this case, the name of the contract == name of the account
 			_self,
 			"transfer"_n,
-			std::make_tuple(inv_req.to, inv_req.from, inv_req.quantity, "Inv Req fulfilled")
+			std::make_tuple(inv_req.to, inv_req.from, inv_req.quantity, std::string{"Inv Req fulfilled"})
 		}.send();
 
 		invRequests.modify(inv_req, merchant_acct, [&](auto& req) {
@@ -219,12 +229,20 @@ namespace SmtsBusiness {
 
 		require_auth(_self);
 		asset yelos = {0, {"YELOS", 4}};
+		asset iron = {0, {"IRON", 4}};
 
 		Stats st1(_self, yelos.symbol.code().raw());
 		auto itr1 = st1.begin();
 
 		while(itr1 != st1.end()){
 			itr1 = st1.erase(itr1);
+		}
+
+		Stats ironSt(_self, iron.symbol.code().raw());
+		auto ironStitr = ironSt.begin();
+
+		while(ironStitr != ironSt.end()){
+			ironStitr = ironSt.erase(ironStitr);
 		}
 
 		Accounts st(_self, ("eosyelosbobb"_n).value);

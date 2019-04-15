@@ -30,7 +30,7 @@ namespace SmtsBusiness {
 
 			// YELOS asset creation and distribution
 			[[eosio::action("createcurr")]]   void CreateToken(const asset& max_supply);
-			[[eosio::action("createcomm")]]   void CreateCmmdty(const name& issuer, const asset& max_supply, const asset& yelos_per_lbs);
+			[[eosio::action("createcomm")]]   void CreateCmmdty(const name& issuer, const asset& max_supply, const asset& unit_price);
 			[[eosio::action("issue")]]        void Issue(const name& to, const asset& quantity, const std::string& memo);
 			[[eosio::action("transfer")]]     void Transfer(const name& from, const name& to, const asset& quantity, const std::string& memo);
 			[[eosio::action("inventoryreq")]] void InvRequest(const name& from, const name& to, const asset& quantity);
