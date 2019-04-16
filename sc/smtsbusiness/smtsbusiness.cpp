@@ -227,12 +227,7 @@ namespace SmtsBusiness {
 		const auto& inv_req = invRequests.get(irId, "Settle Requests that exist only");
 
 		eosio_assert(inv_req.from == customerAcct, "You cannot Settle a request that you didn't initiate");
-
-		asset qntty = inv_req.quantity;
-		// change the symbol for quantity to make it easier to directly multiply qntty and price
-		// this operaton gives the total amount of Tokens to be transfered to the merchant
-		// for the Inventory Request settlement
-		qntty.symbol = inv_req.unit_price.symbol;
+		eosio_assert(inv_req.status == "FULFILLED", "Settling a Req that's not at the 'FULFILLED' stage is not allowed");
 
 		// make the transfer
 		action {
@@ -241,9 +236,13 @@ namespace SmtsBusiness {
 			_self,
 			"transfer"_n,
 			std::make_tuple(
-				inv_req.from, inv_req.to, (inv_req.unit_price * inv_req.quantity.amount), 
+				customerAcct, inv_req.to, (inv_req.unit_price * inv_req.quantity.amount), 
 				std::string{"Inv Req settled"})
-		};
+		}.send();
+
+		invRequests.modify(inv_req, customerAcct, [&](auto& req) {
+			req.status = "PAID";
+		});
 	}
 
 	void SmtsBusiness::DeleteData() {
@@ -285,6 +284,13 @@ namespace SmtsBusiness {
 
 		while(itr3 != commUnitPrices.end()){
 			itr3 = commUnitPrices.erase(itr3);
+		}
+
+		InventoryReqs invRequests(_self, _self.value);
+		auto iter4 = invRequests.begin();
+
+		while(iter4 != invRequests.end()) {
+			iter4 = invRequests.erase(iter4);
 		}
 	}
 }
