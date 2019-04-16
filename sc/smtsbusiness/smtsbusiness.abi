@@ -163,11 +163,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "customer_acct",
+                    "name": "customerAcct",
                     "type": "name"
                 },
                 {
-                    "name": "ir_id",
+                    "name": "irId",
                     "type": "uint64"
                 }
             ]
@@ -246,7 +246,7 @@
             "key_types": []
         },
         {
-            "name": "cunitprice",
+            "name": "cunitprices",
             "type": "CommodityUnitPrice",
             "index_type": "i64",
             "key_names": [],

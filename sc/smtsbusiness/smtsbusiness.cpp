@@ -227,6 +227,23 @@ namespace SmtsBusiness {
 		const auto& inv_req = invRequests.get(irId, "Settle Requests that exist only");
 
 		eosio_assert(inv_req.from == customerAcct, "You cannot Settle a request that you didn't initiate");
+
+		asset qntty = inv_req.quantity;
+		// change the symbol for quantity to make it easier to directly multiply qntty and price
+		// this operaton gives the total amount of Tokens to be transfered to the merchant
+		// for the Inventory Request settlement
+		qntty.symbol = inv_req.unit_price.symbol;
+
+		// make the transfer
+		action {
+			permission_level{customerAcct, "active"_n},
+			// account that owns the contract. In this case, the name of the contract == name of the account
+			_self,
+			"transfer"_n,
+			std::make_tuple(
+				inv_req.from, inv_req.to, (inv_req.unit_price * inv_req.quantity.amount), 
+				std::string{"Inv Req settled"})
+		};
 	}
 
 	void SmtsBusiness::DeleteData() {
