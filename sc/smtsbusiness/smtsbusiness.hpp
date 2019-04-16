@@ -20,6 +20,18 @@ using eosio::symbol_code;
 
 namespace SmtsBusiness {
 
+	// Scrap Metals Business EOS Smart Contract.
+	// 
+	// A platform on which a scrap metal merchant can interact with a scrap metal customer
+	// in a secure and efficient way.
+	//
+	// A scrap metal, in the context of this smart contract, is a EOS token / asset (in this case a Commodity) that can be transfered
+	// from one EOS acct to another, in exchange for another EOS  token / asset (a Currency).
+	//
+	// The units for all Commodities (EOS tokens representing a basic good used in commerce) is pounds (lbs).
+	// Therefore, "10.0 IRON" means 10.0 lbs of IRON.
+	// 
+	// A currency, in the context of this smart contract, is a EOS token that 
 	class [[eosio::contract("smtsbusiness")]] SmtsBusiness : public contract {
 
 		public:
