@@ -31,7 +31,7 @@ namespace SmtsBusiness {
 			[[eosio::action("transfer")]]     void Transfer(const name& from, const name& to, const asset& quantity, const std::string& memo);
 			[[eosio::action("inventoryreq")]] void InvRequest(const name& from, const name& to, const asset& quantity);
 			[[eosio::action("fulfill")]]      void Fulfill(const name& merchant_acct, uint64_t ir_id);
-			[[eosio::action("pay")]]          void Pay(const name& customer_acct, uint64_t ir_id);
+			[[eosio::action("pay")]]          void Pay(const name& customerAcct, uint64_t irId);
 
 			[[eosio::action("deletedata")]]   void DeleteData();
 

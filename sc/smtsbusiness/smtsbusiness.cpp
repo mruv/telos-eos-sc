@@ -207,7 +207,7 @@ namespace SmtsBusiness {
 
 		// An inventory request is fulfilled by transfering some specified amount of Tokens from 
 		// one acct to another
-		action{
+		action {
 			permission_level{inv_req.to, "active"_n},
 			// account that owns the contract. In this case, the name of the contract == name of the account
 			_self,
@@ -220,9 +220,13 @@ namespace SmtsBusiness {
 		});
 	}
 
-	void SmtsBusiness::Pay(const name& customer_acct, uint64_t ir_id) {
+	void SmtsBusiness::Pay(const name& customerAcct, uint64_t irId) {
 
-		require_auth(customer_acct);
+		require_auth(customerAcct);
+		InventoryReqs invRequests(_self, _self.value);
+		const auto& inv_req = invRequests.get(irId, "Settle Requests that exist only");
+
+		eosio_assert(inv_req.from == customerAcct, "You cannot Settle a request that you didn't initiate");
 	}
 
 	void SmtsBusiness::DeleteData() {
