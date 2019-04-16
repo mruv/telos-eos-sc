@@ -5,7 +5,6 @@ namespace SmtsBusiness {
 
 	void SmtsBusiness::CreateToken(const asset& max_supply) {
 
-		// Currency assets can only be created by the owner of this contract
 		require_auth(_self);
 
 		asset yelos = {0, symbol{"YELOS", 4}};
@@ -14,7 +13,6 @@ namespace SmtsBusiness {
 
 		action{
 			permission_level{_self,"active"_n},
-			// account that owns the contract. In this case, the name of the contract == name of the account
 			_self,
 			"issue"_n,
 			std::make_tuple(_self, max_supply, std::string{"Created Tokens Issued to Token Owner"})	
@@ -25,12 +23,10 @@ namespace SmtsBusiness {
 
 		require_auth(issuer);
 
-		// Accounts curr_acc(_self, issuer);
 		Stats commodityStats(_self, unit_price.symbol.code().raw());
 		auto existing_stats_iter = commodityStats.find(unit_price.symbol.code().raw());
 		eosio_assert(existing_stats_iter != commodityStats.end(), "specified currency doesn't exist");
 
-		// auto existing = statsdata.find(asset_sym.code().raw());
 		Create(issuer, max_supply);
 		CommodityUnitPrices commUnitPrices(_self, issuer.value);
 		auto existing_smrts_iter = commUnitPrices.find(max_supply.symbol.code().raw());
@@ -44,7 +40,6 @@ namespace SmtsBusiness {
 
 			action {
 				permission_level {issuer,"active"_n},
-				// account that owns the contract. In this case, the name of the contract == name of the account
 				_self,
 				"issue"_n,
 				std::make_tuple(issuer, max_supply, std::string{"Created Tokens Issued to Token Owner"})	
@@ -58,7 +53,6 @@ namespace SmtsBusiness {
 		}
 	}
 
-	// Define new configuration for a new asset
 	void SmtsBusiness::Create(const name& issuer, const asset& max_supply) {
 
 		auto asset_sym = max_supply.symbol;
@@ -84,14 +78,10 @@ namespace SmtsBusiness {
 	    eosio_assert(asset_sym.is_valid(), "invalid symbol name");
 	    eosio_assert(memo.size() <= 256, "memo has more than 256 bytes");
 
-	    // auto asset_sym_val = asset_sym.raw();
-	    // code --> _self --> contract
-	    // scope --> _self.value --> contract
 	    Stats tokenStats(_self, asset_sym.code().raw());
 	    auto existing = tokenStats.find(asset_sym.code().raw());
 	    eosio_assert(existing != tokenStats.end(), "asset with symbol does not exist, create token before Issue");
 
-	    // An asset can only be Issued by the creator.
 	    require_auth(existing->issuer);
 	    eosio_assert(quantity.is_valid(), "invalid quantity");
 	    eosio_assert(quantity.amount > 0, "must Issue positive quantity");
@@ -108,7 +98,6 @@ namespace SmtsBusiness {
 	    if(to != existing->issuer ) {
 	    	action inline_action = action(
 	    		permission_level{existing->issuer,"active"_n},
-	    		// account that owns the contract. In this case, the name of the contract == name of the account
 	    		_self,
 			    "transfer"_n,
 			    std::make_tuple(existing->issuer, to, quantity, memo)
@@ -150,14 +139,11 @@ namespace SmtsBusiness {
 		auto rcvr_acc = accounts.find(value.symbol.raw());
 
 		if(rcvr_acc == accounts.end()) {
-			// this only happens when the account 'to' is receiving the asset for the
-			// first time.
-			// to == from
-			accounts.emplace(payer, [&](auto& a ) {
+			accounts.emplace(payer, [&](auto& a) {
 				a.balance = value;
 			});
 		} else {
-			accounts.modify(rcvr_acc, payer, [&](auto& a ) {
+			accounts.modify(rcvr_acc, payer, [&](auto& a) {
 				a.balance += value;
 			});
 		}
@@ -167,7 +153,7 @@ namespace SmtsBusiness {
 
 		Accounts accounts(_self, payer.value);
 		const auto& sndr_acc = accounts.get(value.symbol.raw(), "no balance object found");
-		eosio_assert(sndr_acc.balance.amount >= value.amount, "overdrawn balance" );
+		eosio_assert(sndr_acc.balance.amount >= value.amount, "overdrawn balance");
 
 		if(sndr_acc.balance.amount == value.amount ) {
 			accounts.erase(sndr_acc);
@@ -209,7 +195,6 @@ namespace SmtsBusiness {
 		// one acct to another
 		action {
 			permission_level{inv_req.to, "active"_n},
-			// account that owns the contract. In this case, the name of the contract == name of the account
 			_self,
 			"transfer"_n,
 			std::make_tuple(inv_req.to, inv_req.from, inv_req.quantity, std::string{"Inv Req fulfilled"})
@@ -232,7 +217,6 @@ namespace SmtsBusiness {
 		// make the transfer
 		action {
 			permission_level{customerAcct, "active"_n},
-			// account that owns the contract. In this case, the name of the contract == name of the account
 			_self,
 			"transfer"_n,
 			std::make_tuple(
@@ -249,7 +233,7 @@ namespace SmtsBusiness {
 
 		require_auth(_self);
 		asset yelos = {0, {"YELOS", 4}};
-		asset iron = {0, {"IRON", 4}};
+		asset iron = {0, {"IRON", 2}};
 
 		Stats st1(_self, yelos.symbol.code().raw());
 		auto itr1 = st1.begin();
