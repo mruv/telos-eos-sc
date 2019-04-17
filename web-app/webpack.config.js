@@ -9,7 +9,7 @@ module.exports = {
     mode: 'development',
     output: {
         path: __dirname,
-        filename: './built/bundle.js'
+        filename: './public/built/bundle.js'
     }, module: {
         rules: [{
                 test: path.join(__dirname, '.'),
