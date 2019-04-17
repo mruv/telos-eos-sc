@@ -1,18 +1,28 @@
 import React, { Fragment } from 'react'
-import Header from './Header';
-import Body from './Body';
+import NavBar from './NavBar';
+import Main from './Main';
+import { HashRouter } from 'react-router-dom';
+import Axios from 'axios';
 
 export default class TelosEos extends React.Component {
-    constructor(props) { super(props) }
+    constructor(props) {
+        super(props)
+    }
+
+    componentDidMount() {
+        Axios.get("/info").then((res) => {
+            console.log(res)
+        })
+    }
 
     render() {
         return (
-        <Fragment>
-            <Header>
-            </Header>
-            <Body>
-                
-            </Body>
-        </Fragment>)
+            <HashRouter>
+                <Fragment>
+                    <NavBar />
+                    <Main />
+                </Fragment>
+            </HashRouter>
+        )
     }
 }
