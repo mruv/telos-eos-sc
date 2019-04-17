@@ -7,7 +7,9 @@ class TelosEos extends React.Component {
 	constructor(props) { super(props) }
 
 	render() {
-		return <p>Hello Telos EOS </p>
+		return (
+			<p>Hello Telos EOS</p>
+			)
 	}
 }
 
