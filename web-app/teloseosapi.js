@@ -39,5 +39,17 @@ module.exports = {
             })
     },
 
-    info: async () => await rpc.get_account('eosio.token')
+    info: async (account) => await rpc.get_account(account),
+
+    getInventoryReqs: async () => await rpc.get_table_rows({
+        json: true,                
+        code: 'eosyelosbobb',         
+        scope: 'eosyelosbobb',         
+        table: 'inventreqs',   
+        limit: 100,                  
+        reverse: false,      
+        show_payer: false,
+    }),
+
+    getCurrencyBal: async (account, symbol) => await rpc.get_currency_balance("eosyelosbobb", account, symbol)
 }
