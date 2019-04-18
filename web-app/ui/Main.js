@@ -9,18 +9,23 @@ export default class Main extends React.Component {
         super(props)
 
         this.state = {
-            isLoading: true, 
+            isLoading: true,
             bob: { name: '', tlos: '', ylos: '', iron: '' },
             erik: { name: '', tlos: '', ylos: '', iron: '' }
         }
 
         this.fetchInvReqs = this.fetchInvReqs.bind(this)
         this.fetchYelosBal = this.fetchYelosBal.bind(this)
+        this.fetchInfo = this.fetchInfo.bind(this)
     }
 
-
-
     componentDidMount() {
+        this.fetchInfo()
+        this.fetchInvReqs()
+        this.fetchYelosBal()
+    }
+
+    fetchInfo() {
         Axios.get("/info").then((res) => {
             this.setState((state) => {
                 const bob_e = state.bob
@@ -38,9 +43,6 @@ export default class Main extends React.Component {
                 }
             })
         })
-
-        this.fetchInvReqs()
-        this.fetchYelosBal()
     }
 
     fetchInvReqs() {
@@ -48,8 +50,6 @@ export default class Main extends React.Component {
             this.setState((state) => {
                 return { invReqs: res.data }
             })
-
-            console.log(this.state)
         })
     }
 
@@ -71,15 +71,13 @@ export default class Main extends React.Component {
                     isLoading: false
                 }
             })
-
-            console.log(this.state)
         })
     }
 
     fetchCommPrices() {
         Axios.get("/curr_bal").then((res) => {
             this.setState((state) => {
-                return { ...res.data }
+                return { prices : res.data }
             })
 
             console.log(this.state)

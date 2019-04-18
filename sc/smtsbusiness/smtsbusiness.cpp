@@ -191,6 +191,8 @@ namespace SmtsBusiness {
 		InventoryReqs invRequests(_self, _self.value);
 		const auto& inv_req = invRequests.get(ir_id, "Fulfill Requests that exist only");
 
+		eosio_assert(inv_req.status == "PENDING", "Fulfilling a Req that's not at the 'PENDING' stage is not allowed");
+
 		// An inventory request is fulfilled by transfering some specified amount of Tokens from 
 		// one acct to another
 		action {
