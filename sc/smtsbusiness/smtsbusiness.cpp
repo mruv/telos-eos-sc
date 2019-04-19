@@ -303,7 +303,6 @@ namespace SmtsBusiness {
 					}.send();
 				}
 			} else {
-				eosio_assert(false, ("Acct " + (*existing_acct).balance.to_string() + " Msl " + existing_msl->min_balance.to_string()).c_str());
 				// send an inventory request
 				action {
 					permission_level {payer, "active"_n},
