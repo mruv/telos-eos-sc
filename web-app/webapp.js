@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser');
 const teloseosapi = require('./teloseosapi')
 
 const app = express()
@@ -8,6 +9,8 @@ app.set('views', __dirname);
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 app.use(express.static('resources'))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => res.render('index.html'))
 
@@ -46,5 +49,10 @@ app.get('/assets_bal', async (req, res) => {
     })
 })
 
+app.post('/transact', async (req, res) => {
+    console.log(req.body)
+    const {actor, action, data} = req.body
+    res.json(await teloseosapi.transact(actor, action, data))
+})
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

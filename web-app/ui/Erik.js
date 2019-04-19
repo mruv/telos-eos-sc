@@ -1,11 +1,11 @@
-import React, { Fragment } from 'react'
-import { Card, Container, ListGroup, Col, Row } from 'react-bootstrap';
+import React from 'react'
+import { Container, Card, ListGroup, Row, Col, Button, Form, FormControl } from 'react-bootstrap';
 
 export default class Erik extends React.Component {
     constructor(props) { super(props) }
 
     render() {
-        const { name, tlos, ylos, iron, invReqs } = this.props
+        const { name, tlos, ylos, iron, invReqs, onPushAction } = this.props
 
         return (
             <Card style={{ marginTop: '12px' }}>
@@ -25,7 +25,9 @@ export default class Erik extends React.Component {
                 <Card.Header>Commodities</Card.Header>
                 <Card.Body>
                     <ListGroup>
-                        <ListGroup.Item>{iron}</ListGroup.Item>
+                        <ListGroup.Item>
+                            {iron}
+                        </ListGroup.Item>
                     </ListGroup>
                 </Card.Body>
                 <Card.Header>Inventory Requests</Card.Header>
@@ -33,19 +35,42 @@ export default class Erik extends React.Component {
                     <Container>
                         <ListGroup>
                             <ListGroup.Item key={1000}>
-                                <Row style={{color: 'teal'}}>
-                                <Col>From</Col><Col>Quantity</Col><Col>Price</Col><Col>Status</Col>
+                                <Row style={{ color: 'teal' }}>
+                                    <Col>To</Col>
+                                    <Col>Quantity <i>(lbs)</i></Col>
+                                    <Col>Price</Col>
+                                    <Col>Status</Col>
+                                    <Col><span></span></Col>
                                 </Row>
                             </ListGroup.Item>
                             {
                                 invReqs.map((req, index) => {
                                     return (
-                                        <ListGroup.Item key={index}>
+                                        <ListGroup.Item key={index} size="sm">
                                             <Row>
-                                                <Col>{req.from}</Col>
+                                                <Col>{req.to}</Col>
                                                 <Col>{req.quantity}</Col>
                                                 <Col>{req.unit_price} / <i>lbs</i></Col>
                                                 <Col>{req.status}</Col>
+                                                <Col>
+                                                    {
+                                                        req.status == "PENDING" ?
+                                                            <Button
+                                                                variant="outline-primary" size="sm"
+                                                                onClick={(e) => {
+                                                                    onPushAction({
+                                                                        actor: name,
+                                                                        action: "fulfill",
+                                                                        data: {
+                                                                            merchantAcct: name,
+                                                                            irId: index
+                                                                        }
+                                                                    })
+                                                                }
+                                                                }>Fulfill</Button>
+                                                            : <span></span>
+                                                    }
+                                                </Col>
                                             </Row>
                                         </ListGroup.Item>
                                     )

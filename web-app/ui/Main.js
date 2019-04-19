@@ -17,6 +17,8 @@ export default class Main extends React.Component {
         this.fetchInvReqs = this.fetchInvReqs.bind(this)
         this.fetchYelosBal = this.fetchYelosBal.bind(this)
         this.fetchInfo = this.fetchInfo.bind(this)
+        this.handlePushActionOver = this.handlePushActionOver.bind(this)
+        this.pushAction = this.pushAction.bind(this)
     }
 
     componentDidMount() {
@@ -77,11 +79,23 @@ export default class Main extends React.Component {
     fetchCommPrices() {
         Axios.get("/curr_bal").then((res) => {
             this.setState((state) => {
-                return { prices : res.data }
+                return { prices: res.data }
             })
-
-            console.log(this.state)
         })
+    }
+
+    handlePushActionOver(res) {
+        this.setState((state) => {
+            return {isLoading: true}
+        })
+        this.fetchInfo()
+        this.fetchInvReqs()
+        this.fetchYelosBal()
+    }
+
+    pushAction(conf) {
+        console.log(conf)
+        Axios.post('/transact', conf).then(this.handlePushActionOver)
     }
 
     render() {
@@ -92,10 +106,10 @@ export default class Main extends React.Component {
                 <Container style={{ marginTop: '20px' }}>
                     <Tabs defaultActiveKey="bob">
                         <Tab eventKey="bob" title="Bob">
-                            <Bob {...bob} invReqs={invReqs} />
+                            <Bob {...bob} invReqs={invReqs} onPushAction={this.pushAction} />
                         </Tab>
                         <Tab eventKey="erik" title="Erik">
-                            <Erik {...erik} invReqs={invReqs} />
+                            <Erik {...erik} invReqs={invReqs} onPushAction={this.pushAction} />
                         </Tab>
                     </Tabs>
                 </Container>

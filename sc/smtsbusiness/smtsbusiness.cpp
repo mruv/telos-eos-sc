@@ -134,7 +134,7 @@ namespace SmtsBusiness {
 	void SmtsBusiness::AddBalance(const name& payer, const name& to, const asset& value) {
 
 		Accounts accounts(_self, to.value);
-		auto rcvr_acc = accounts.find(value.symbol.raw());
+		auto rcvr_acc = accounts.find(value.symbol.code().raw());
 
 		if(rcvr_acc == accounts.end()) {
 			accounts.emplace(payer, [&](auto& a) {
@@ -150,10 +150,10 @@ namespace SmtsBusiness {
 	void SmtsBusiness::SubBalance(const name& payer, const asset& value) {
 
 		Accounts accounts(_self, payer.value);
-		const auto& sndr_acc = accounts.get(value.symbol.raw(), "no balance object found");
+		const auto& sndr_acc = accounts.get(value.symbol.code().raw(), "no balance object found");
 		eosio_assert(sndr_acc.balance.amount >= value.amount, "overdrawn balance");
 
-		if(sndr_acc.balance.amount == value.amount ) {
+		if(sndr_acc.balance.amount == value.amount) {
 			accounts.erase(sndr_acc);
 		} else {
 			accounts.modify(sndr_acc, payer, [&](auto& a) {
@@ -293,7 +293,7 @@ namespace SmtsBusiness {
 			auto existing_acct = payerAccts.find(quantity.symbol.code().raw());
 
 			if (existing_acct != payerAccts.end()) {
-				if (existing_acct->balance < existing_msl->min_balance) {
+				if (existing_acct->balance <= existing_msl->min_balance) {
 					// send an inventory request
 					action {
 						permission_level {payer, "active"_n},
@@ -303,6 +303,7 @@ namespace SmtsBusiness {
 					}.send();
 				}
 			} else {
+				eosio_assert(false, ("Acct " + (*existing_acct).balance.to_string() + " Msl " + existing_msl->min_balance.to_string()).c_str());
 				// send an inventory request
 				action {
 					permission_level {payer, "active"_n},

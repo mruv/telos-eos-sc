@@ -165,6 +165,14 @@
                 {
                     "name": "min_balance",
                     "type": "asset"
+                },
+                {
+                    "name": "invreq_amnt",
+                    "type": "asset"
+                },
+                {
+                    "name": "supplier",
+                    "type": "name"
                 }
             ]
         },
@@ -179,6 +187,20 @@
                 {
                     "name": "irId",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "Sell",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
                 }
             ]
         },
@@ -201,6 +223,28 @@
                 {
                     "name": "memo",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "UpsertMsl",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
+                {
+                    "name": "supplier",
+                    "type": "name"
+                },
+                {
+                    "name": "minBal",
+                    "type": "asset"
+                },
+                {
+                    "name": "invreqAmnt",
+                    "type": "asset"
                 }
             ]
         }
@@ -242,8 +286,18 @@
             "ricardian_contract": ""
         },
         {
+            "name": "sell",
+            "type": "Sell",
+            "ricardian_contract": ""
+        },
+        {
             "name": "transfer",
             "type": "Transfer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "upsertmsl",
+            "type": "UpsertMsl",
             "ricardian_contract": ""
         }
     ],
@@ -270,7 +324,7 @@
             "key_types": []
         },
         {
-            "name": "minstocklev",
+            "name": "minstocklevs",
             "type": "MinStockLevel",
             "index_type": "i64",
             "key_names": [],

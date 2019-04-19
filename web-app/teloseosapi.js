@@ -1,7 +1,6 @@
 const { Api, JsonRpc, RpcError } = require('eosjs')
 const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig')
 const fetch = require('node-fetch')
-// const { TextEncoder, TextDecoder } = require('util')
 const { TextEncoder, TextDecoder } = require('text-encoding')
 
 const signatureProvider = new JsSignatureProvider([
@@ -25,7 +24,7 @@ module.exports = {
             {
                 actions: [
                     {
-                        account: 'eosyelosbobb',
+                        account: 'eosyelosbobb', // smart contract owner
                         name: action,
                         authorization: [
                             { actor: actor, permission: 'active', }
@@ -42,12 +41,12 @@ module.exports = {
     info: async (account) => await rpc.get_account(account),
 
     getInventoryReqs: async () => await rpc.get_table_rows({
-        json: true,                
-        code: 'eosyelosbobb',         
-        scope: 'eosyelosbobb',         
-        table: 'inventreqs',   
-        limit: 100,                  
-        reverse: false,      
+        json: true,
+        code: 'eosyelosbobb',
+        scope: 'eosyelosbobb',
+        table: 'inventreqs',
+        limit: 100,
+        reverse: false,
         show_payer: false,
     }),
 

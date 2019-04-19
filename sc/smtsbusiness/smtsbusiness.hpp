@@ -58,7 +58,7 @@ namespace SmtsBusiness {
 			struct [[eosio::table("account")]] Account {
 				asset    balance;
 
-				uint64_t primary_key() const { return balance.symbol.raw(); }
+				uint64_t primary_key() const { return balance.symbol.code().raw(); }
 			};
 
 			struct [[eosio::table("assetstats")]] AssetStats {
