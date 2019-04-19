@@ -50,7 +50,7 @@ app.get('/assets_bal', async (req, res) => {
 })
 
 app.post('/transact', async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     const {actor, action, data} = req.body
     res.json(await teloseosapi.transact(actor, action, data))
 })
