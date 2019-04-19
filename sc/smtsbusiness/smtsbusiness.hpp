@@ -45,6 +45,7 @@ namespace SmtsBusiness {
 			[[eosio::action("fulfill")]]      void Fulfill(const name& merchantAcct, uint64_t irId);
 			[[eosio::action("pay")]]          void Pay(const name& customerAcct, uint64_t irId);
 			[[eosio::action("upsertmsl")]]    void UpsertMsl(const name& payer, const asset& commodity);
+			[[eosio::action("sell")]]         void Sell(const name& payer, const asset& quantity);
 
 			[[eosio::action("deletedata")]]   void DeleteData();
 

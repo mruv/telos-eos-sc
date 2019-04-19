@@ -252,6 +252,44 @@ namespace SmtsBusiness {
 		}
 	}
 
+	void SmtsBusiness::Sell(const name& payer, const asset& quantity) {
+
+        eosio_assert(is_account(payer), "payer account does not exist");
+        require_auth(payer);
+		eosio_assert(quantity.is_valid(), "invalid quantity" );
+		eosio_assert(quantity.amount > 0, "must Sell positive value");
+
+        Stats commodityStats(_self, quantity.symbol.code().raw());
+        const auto& existing_comm_stats = commodityStats.get(quantity.symbol.code().raw(), 
+        	"token with symbol does not exist, create token before burn");
+
+        eosio_assert(quantity.symbol == existing_comm_stats.supply.symbol, "symbol precision mismatch");
+        eosio_assert(quantity.amount <= existing_comm_stats.supply.amount, "quantity exceeds available supply");
+
+        commodityStats.modify(existing_comm_stats, payer, [&](auto& commStats) {
+        	commStats.supply -= quantity;
+        });
+
+        SubBalance(payer, quantity);
+
+        Accounts payerAccts(_self, payer.value);
+		auto existing_acct = payerAccts.find(quantity.symbol.code().raw());
+
+		if (existing_acct != payerAccts.end()) {
+			if (existing_acct->balance < asset{10, {"IRON", 1}}) {
+				// send an inventory request
+				action {
+					permission_level {payer, "active"_n},
+					_self,
+					"inventoryreq"_n,
+					std::make_tuple(payer, "eosyeloserik"_n, asset {100, {"IRON", 1}})
+				}.send();
+			}
+		} else {
+
+		}
+	}
+
 	void SmtsBusiness::DeleteData() {
 
 		require_auth(_self);

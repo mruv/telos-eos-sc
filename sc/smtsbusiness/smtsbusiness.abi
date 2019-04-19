@@ -183,6 +183,20 @@
             ]
         },
         {
+            "name": "Sell",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "Transfer",
             "base": "",
             "fields": [
@@ -253,6 +267,11 @@
         {
             "name": "pay",
             "type": "Pay",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sell",
+            "type": "Sell",
             "ricardian_contract": ""
         },
         {
