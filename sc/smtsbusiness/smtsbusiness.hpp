@@ -44,7 +44,7 @@ namespace SmtsBusiness {
 			[[eosio::action("inventoryreq")]] void InvRequest(const name& from, const name& to, const asset& quantity);
 			[[eosio::action("fulfill")]]      void Fulfill(const name& merchantAcct, uint64_t irId);
 			[[eosio::action("pay")]]          void Pay(const name& customerAcct, uint64_t irId);
-			[[eosio::action("upsertmsl")]]    void UpsertMsl(const name& payer, const asset& commodity);
+			[[eosio::action("upsertmsl")]]    void UpsertMsl(const name& payer, const name& supplier, const asset& minBal, const asset& invreqAmnt);
 			[[eosio::action("sell")]]         void Sell(const name& payer, const asset& quantity);
 
 			[[eosio::action("deletedata")]]   void DeleteData();
@@ -91,9 +91,11 @@ namespace SmtsBusiness {
 			// Specifies the minimun amount of a certain comodity (in this context, scrap metal) that should trigger
 			// an inventory request
 			struct [[eosio::table("minstocklev")]] MinStockLevel {
-				asset supply;
+				asset min_balance;
+				asset invreq_amnt;
+				name  supplier;
 
-				uint64_t primary_key() const { return supply.symbol.code().raw(); } 
+				uint64_t primary_key() const { return min_balance.symbol.code().raw(); } 
 			};
 
 			// Table configuration
@@ -101,6 +103,6 @@ namespace SmtsBusiness {
 			typedef multi_index<"stat"_n, AssetStats>                Stats;
 			typedef multi_index<"cunitprices"_n, CommodityUnitPrice> CommodityUnitPrices;
 			typedef multi_index<"inventreqs"_n, InventoryReq>        InventoryReqs;
-			typedef multi_index<"minstocklev"_n, MinStockLevel>      MinStockLevels;
+			typedef multi_index<"minstocklevs"_n, MinStockLevel>     MinStockLevels;
 	};
 }

@@ -229,25 +229,37 @@ namespace SmtsBusiness {
 		});
 	}
 
-	void SmtsBusiness::UpsertMsl(const name& payer, const asset& supply) {
+	void SmtsBusiness::UpsertMsl(const name& payer, const name& supplier, const asset& minBal, const asset& invreqAmnt) {
 
-		eosio_assert(is_account(payer), "to account does not exist");
+		eosio_assert(payer != supplier, "'supplier' cannot be the sender of a request");
+		eosio_assert(is_account(payer), "'payer' does not exist");
+		eosio_assert(is_account(supplier), "'supplier' account does not exist");
 		require_auth(payer);
 
-		eosio_assert(supply.is_valid(), "invalid supply" );
-		eosio_assert(supply.amount > 0, "must UpsertMsl positive value" );
+		eosio_assert(minBal.is_valid(), "invalid minBal");
+		eosio_assert(minBal.amount > 0, "must UpsertMsl positive value -- 'minBal'");
+
+		eosio_assert(invreqAmnt.is_valid(), "invalid 'invreqAmnt'");
+		eosio_assert(invreqAmnt.amount > 0, "must UpsertMsl positive value -- 'invreqAmnt'");
+
+		eosio_assert(minBal.symbol == invreqAmnt.symbol, "precision mismatch");
+		eosio_assert(minBal.symbol.code() == invreqAmnt.symbol.code(), "symbol value mismatch");
 		
 		MinStockLevels msLevels(_self, payer.value);
-		auto existing_msl = msLevels.find(supply.symbol.code().raw());
+		auto existing_msl = msLevels.find(minBal.symbol.code().raw());
 
 		// create new
 		if (existing_msl == msLevels.end()) {
 			msLevels.emplace(payer, [&](auto& msLevel) {
-				msLevel.supply = supply;
+				msLevel.min_balance = minBal;
+				msLevel.invreq_amnt = invreqAmnt;
+				msLevel.supplier    = supplier;
 			});
 		} else { // update
 			msLevels.modify(existing_msl, payer, [&](auto& msLevel) {
-				msLevel.supply = supply;
+				msLevel.min_balance = minBal;
+				msLevel.invreq_amnt = invreqAmnt;
+				msLevel.supplier    = supplier;
 			});
 		}
 	}
@@ -272,21 +284,33 @@ namespace SmtsBusiness {
 
         SubBalance(payer, quantity);
 
-        Accounts payerAccts(_self, payer.value);
-		auto existing_acct = payerAccts.find(quantity.symbol.code().raw());
+        MinStockLevels msLevels(_self, payer.value);
+		auto existing_msl = msLevels.find(quantity.symbol.code().raw());
 
-		if (existing_acct != payerAccts.end()) {
-			if (existing_acct->balance < asset{10, {"IRON", 1}}) {
+		if (existing_msl != msLevels.end()) {
+
+			Accounts payerAccts(_self, payer.value);
+			auto existing_acct = payerAccts.find(quantity.symbol.code().raw());
+
+			if (existing_acct != payerAccts.end()) {
+				if (existing_acct->balance < existing_msl->min_balance) {
+					// send an inventory request
+					action {
+						permission_level {payer, "active"_n},
+						_self,
+						"inventoryreq"_n,
+						std::make_tuple(payer, existing_msl->supplier, existing_msl->invreq_amnt)
+					}.send();
+				}
+			} else {
 				// send an inventory request
 				action {
 					permission_level {payer, "active"_n},
 					_self,
 					"inventoryreq"_n,
-					std::make_tuple(payer, "eosyeloserik"_n, asset {100, {"IRON", 1}})
+					std::make_tuple(payer, existing_msl->supplier, existing_msl->invreq_amnt)
 				}.send();
 			}
-		} else {
-
 		}
 	}
 
@@ -336,6 +360,13 @@ namespace SmtsBusiness {
 
 		while(iter4 != invRequests.end()) {
 			iter4 = invRequests.erase(iter4);
+		}
+
+		MinStockLevels msLevels(_self, ("eosyelosbobb"_n).value);
+		auto lvls = msLevels.begin();
+
+		while(lvls != msLevels.end()) {
+			lvls = msLevels.erase(lvls);
 		}
 	}
 }

@@ -163,7 +163,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "supply",
+                    "name": "min_balance",
                     "type": "asset"
                 }
             ]
@@ -179,20 +179,6 @@
                 {
                     "name": "irId",
                     "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "Sell",
-            "base": "",
-            "fields": [
-                {
-                    "name": "payer",
-                    "type": "name"
-                },
-                {
-                    "name": "quantity",
-                    "type": "asset"
                 }
             ]
         },
@@ -215,20 +201,6 @@
                 {
                     "name": "memo",
                     "type": "string"
-                }
-            ]
-        },
-        {
-            "name": "UpsertMsl",
-            "base": "",
-            "fields": [
-                {
-                    "name": "payer",
-                    "type": "name"
-                },
-                {
-                    "name": "commodity",
-                    "type": "asset"
                 }
             ]
         }
@@ -270,18 +242,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "sell",
-            "type": "Sell",
-            "ricardian_contract": ""
-        },
-        {
             "name": "transfer",
             "type": "Transfer",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "upsertmsl",
-            "type": "UpsertMsl",
             "ricardian_contract": ""
         }
     ],
