@@ -3,62 +3,62 @@
 
 namespace SmtsBusiness {
 
-	void SmtsBusiness::CreateToken(const asset& max_supply) {
+	void SmtsBusiness::CreateToken(const asset& maxSupply) {
 
 		require_auth(_self);
 
 		asset yelos = {0, symbol{"YELOS", 4}};
-		eosio_assert(yelos.symbol.code().raw() == max_supply.symbol.code().raw(), "YELOS is the contract's only currency / token");
-		Create(_self, max_supply);
+		eosio_assert(yelos.symbol.code().raw() == maxSupply.symbol.code().raw(), "YELOS is the contract's only currency / token");
+		Create(_self, maxSupply);
 
 		action{
 			permission_level{_self,"active"_n},
 			_self,
 			"issue"_n,
-			std::make_tuple(_self, max_supply, std::string{"Created Tokens Issued to Token Owner"})	
+			std::make_tuple(_self, maxSupply, std::string{"Created Tokens Issued to Token Owner"})	
 		}.send();
 	}
 
-	void SmtsBusiness::CreateCmmdty(const name& issuer, const asset& max_supply, const asset& unit_price) {
+	void SmtsBusiness::CreateCmmdty(const name& issuer, const asset& maxSupply, const asset& unitPrice) {
 
 		require_auth(issuer);
 
-		Stats commodityStats(_self, unit_price.symbol.code().raw());
-		auto existing_stats_iter = commodityStats.find(unit_price.symbol.code().raw());
+		Stats commodityStats(_self, unitPrice.symbol.code().raw());
+		auto existing_stats_iter = commodityStats.find(unitPrice.symbol.code().raw());
 		eosio_assert(existing_stats_iter != commodityStats.end(), "specified currency doesn't exist");
 
-		Create(issuer, max_supply);
+		Create(issuer, maxSupply);
 		CommodityUnitPrices commUnitPrices(_self, issuer.value);
-		auto existing_smrts_iter = commUnitPrices.find(max_supply.symbol.code().raw());
+		auto existing_smrts_iter = commUnitPrices.find(maxSupply.symbol.code().raw());
 
 		if (existing_smrts_iter == commUnitPrices.end()) {
 			// create new
 			commUnitPrices.emplace(issuer, [&](auto& smrate) {
-				smrate.comm_name  = max_supply.symbol.code();
-				smrate.unit_price = unit_price;
+				smrate.comm_name  = maxSupply.symbol.code();
+				smrate.unit_price = unitPrice;
 			});
 
 			action {
 				permission_level {issuer,"active"_n},
 				_self,
 				"issue"_n,
-				std::make_tuple(issuer, max_supply, std::string{"Created Tokens Issued to Token Owner"})	
+				std::make_tuple(issuer, maxSupply, std::string{"Created Tokens Issued to Token Owner"})	
 			}.send();
 
 		}  else {
 			// update
 			commUnitPrices.modify(existing_smrts_iter, issuer, [&](auto& smrate) {
-				smrate.unit_price = unit_price;
+				smrate.unit_price = unitPrice;
 			});
 		}
 	}
 
-	void SmtsBusiness::Create(const name& issuer, const asset& max_supply) {
+	void SmtsBusiness::Create(const name& issuer, const asset& maxSupply) {
 
-		auto asset_sym = max_supply.symbol;
+		auto asset_sym = maxSupply.symbol;
 		eosio_assert(asset_sym.is_valid(), "invalid symbol name" );
-		eosio_assert(max_supply.is_valid(), "invalid supply");
-		eosio_assert(max_supply.amount > 0, "max-supply must be positive");
+		eosio_assert(maxSupply.is_valid(), "invalid supply");
+		eosio_assert(maxSupply.amount > 0, "max-supply must be positive");
 
 		Stats assetStats(_self, asset_sym.code().raw());
 		auto existing = assetStats.find(asset_sym.code().raw());
@@ -66,8 +66,8 @@ namespace SmtsBusiness {
 
 		// create a new asset
 		assetStats.emplace(_self, [&](auto& s) {
-		   s.supply.symbol = max_supply.symbol;
-		   s.max_supply    = max_supply;
+		   s.supply.symbol = maxSupply.symbol;
+		   s.max_supply    = maxSupply;
 		   s.issuer        = issuer;
 		});
 	}
@@ -93,17 +93,15 @@ namespace SmtsBusiness {
 	       s.supply += quantity;
 	    });
 
-	    UpdateDestAcct(existing->issuer, existing->issuer, quantity);
+	    AddBalance(existing->issuer, existing->issuer, quantity);
 
 	    if(to != existing->issuer ) {
-	    	action inline_action = action(
+	    	action {
 	    		permission_level{existing->issuer,"active"_n},
 	    		_self,
 			    "transfer"_n,
 			    std::make_tuple(existing->issuer, to, quantity, memo)
-			  );
-
-	    	inline_action.send();
+			}.send();
 	    }
 	}
 
@@ -128,12 +126,12 @@ namespace SmtsBusiness {
 		eosio_assert(memo.size() <= 256, "memo has more than 256 bytes" );
 
 		// update sender balance
-		UpdateSrcAcct(from, quantity);
+		SubBalance(from, quantity);
 		// update receiver balance
-		UpdateDestAcct(from, to, quantity);
+		AddBalance(from, to, quantity);
 	}
 
-	void SmtsBusiness::UpdateDestAcct(const name& payer, const name& to, const asset& value) {
+	void SmtsBusiness::AddBalance(const name& payer, const name& to, const asset& value) {
 
 		Accounts accounts(_self, to.value);
 		auto rcvr_acc = accounts.find(value.symbol.raw());
@@ -149,7 +147,7 @@ namespace SmtsBusiness {
 		}
 	}
 
-	void SmtsBusiness::UpdateSrcAcct(const name& payer, const asset& value) {
+	void SmtsBusiness::SubBalance(const name& payer, const asset& value) {
 
 		Accounts accounts(_self, payer.value);
 		const auto& sndr_acc = accounts.get(value.symbol.raw(), "no balance object found");
@@ -184,12 +182,12 @@ namespace SmtsBusiness {
 		});
 	}
 
-	void SmtsBusiness::Fulfill(const name& merchant_acct, uint64_t ir_id) {
+	void SmtsBusiness::Fulfill(const name& merchantAcct, uint64_t irId) {
 
-		require_auth(merchant_acct);
+		require_auth(merchantAcct);
 
 		InventoryReqs invRequests(_self, _self.value);
-		const auto& inv_req = invRequests.get(ir_id, "Fulfill Requests that exist only");
+		const auto& inv_req = invRequests.get(irId, "Fulfill Requests that exist only");
 
 		eosio_assert(inv_req.status == "PENDING", "Fulfilling a Req that's not at the 'PENDING' stage is not allowed");
 
@@ -202,7 +200,7 @@ namespace SmtsBusiness {
 			std::make_tuple(inv_req.to, inv_req.from, inv_req.quantity, std::string{"Inv Req fulfilled"})
 		}.send();
 
-		invRequests.modify(inv_req, merchant_acct, [&](auto& req) {
+		invRequests.modify(inv_req, merchantAcct, [&](auto& req) {
 			req.status = "FULFILLED";
 		});
 	}
@@ -224,11 +222,17 @@ namespace SmtsBusiness {
 			std::make_tuple(
 				customerAcct, inv_req.to, (inv_req.unit_price * inv_req.quantity.amount), 
 				std::string{"Inv Req settled"})
-		}.send();
+		}.send();UpdateDestAcct
 
 		invRequests.modify(inv_req, customerAcct, [&](auto& req) {
 			req.status = "PAID";
 		});
+	}
+
+	void SmtsBusiness::UpsertMsl(const name& payer, const asset& commodity) {
+
+		require_auth(payer);
+
 	}
 
 	void SmtsBusiness::DeleteData() {

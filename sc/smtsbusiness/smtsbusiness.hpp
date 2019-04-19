@@ -37,21 +37,22 @@ namespace SmtsBusiness {
 		public:
 			SmtsBusiness(name self, name code, datastream<const char*> ds) : contract(self, code, ds) {}
 
-			[[eosio::action("createcurr")]]   void CreateToken(const asset& max_supply);
-			[[eosio::action("createcomm")]]   void CreateCmmdty(const name& issuer, const asset& max_supply, const asset& unit_price);
+			[[eosio::action("createcurr")]]   void CreateToken(const asset& maxSupply);
+			[[eosio::action("createcomm")]]   void CreateCmmdty(const name& issuer, const asset& maxSupply, const asset& unitPrice);
 			[[eosio::action("issue")]]        void Issue(const name& to, const asset& quantity, const std::string& memo);
 			[[eosio::action("transfer")]]     void Transfer(const name& from, const name& to, const asset& quantity, const std::string& memo);
 			[[eosio::action("inventoryreq")]] void InvRequest(const name& from, const name& to, const asset& quantity);
-			[[eosio::action("fulfill")]]      void Fulfill(const name& merchant_acct, uint64_t ir_id);
+			[[eosio::action("fulfill")]]      void Fulfill(const name& merchantAcct, uint64_t irId);
 			[[eosio::action("pay")]]          void Pay(const name& customerAcct, uint64_t irId);
+			[[eosio::action("upsertmsl")]]    void UpsertMsl(const name& payer, const asset& commodity);
 
 			[[eosio::action("deletedata")]]   void DeleteData();
 
 		private:
 
-			void Create(const name& issuer, const asset& max_supply);
-			void UpdateDestAcct(const name& from, const name& to, const asset& value);
-			void UpdateSrcAcct(const name& owner, const asset& value);
+			void Create(const name& issuer, const asset& maxSupply);
+			void AddBalance(const name& from, const name& to, const asset& value);
+			void SubBalance(const name& owner, const asset& value);
 			
 			struct [[eosio::table("account")]] Account {
 				asset    balance;
@@ -85,10 +86,20 @@ namespace SmtsBusiness {
 				uint64_t primary_key() const { return id; }
 			};
 
+			// Minimum Stock Levels
+			// Specifies the minimun amount of a certain comodity (in this context, scrap metal) that should trigger
+			// an inventory request
+			struct [[eosio::table("minstocklev")]] MinStockLevel {
+				asset min_level;
+
+				uint64_t primary_key() const { return min_level.symbol.code().raw() } 
+			};
+
 			// Table configuration
 			typedef multi_index<"accounts"_n, Account>               Accounts;
 			typedef multi_index<"stat"_n, AssetStats>                Stats;
 			typedef multi_index<"cunitprices"_n, CommodityUnitPrice> CommodityUnitPrices;
 			typedef multi_index<"inventreqs"_n, InventoryReq>        InventoryReqs;
+			typedef multi_index<"minstocklev"_n, MinStockLevel>      MinStockLevels;
 	};
 }
