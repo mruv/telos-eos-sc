@@ -54,11 +54,11 @@
                     "type": "name"
                 },
                 {
-                    "name": "max_supply",
+                    "name": "maxSupply",
                     "type": "asset"
                 },
                 {
-                    "name": "unit_price",
+                    "name": "unitPrice",
                     "type": "asset"
                 }
             ]
@@ -68,7 +68,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "max_supply",
+                    "name": "maxSupply",
                     "type": "asset"
                 }
             ]
@@ -83,11 +83,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "merchant_acct",
+                    "name": "merchantAcct",
                     "type": "name"
                 },
                 {
-                    "name": "ir_id",
+                    "name": "irId",
                     "type": "uint64"
                 }
             ]
@@ -159,6 +159,16 @@
             ]
         },
         {
+            "name": "MinStockLevel",
+            "base": "",
+            "fields": [
+                {
+                    "name": "supply",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "Pay",
             "base": "",
             "fields": [
@@ -191,6 +201,20 @@
                 {
                     "name": "memo",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "UpsertMsl",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
+                {
+                    "name": "commodity",
+                    "type": "asset"
                 }
             ]
         }
@@ -235,6 +259,11 @@
             "name": "transfer",
             "type": "Transfer",
             "ricardian_contract": ""
+        },
+        {
+            "name": "upsertmsl",
+            "type": "UpsertMsl",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -255,6 +284,13 @@
         {
             "name": "inventreqs",
             "type": "InventoryReq",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "minstocklev",
+            "type": "MinStockLevel",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

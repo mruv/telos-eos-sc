@@ -90,9 +90,9 @@ namespace SmtsBusiness {
 			// Specifies the minimun amount of a certain comodity (in this context, scrap metal) that should trigger
 			// an inventory request
 			struct [[eosio::table("minstocklev")]] MinStockLevel {
-				asset min_level;
+				asset supply;
 
-				uint64_t primary_key() const { return min_level.symbol.code().raw() } 
+				uint64_t primary_key() const { return supply.symbol.code().raw(); } 
 			};
 
 			// Table configuration

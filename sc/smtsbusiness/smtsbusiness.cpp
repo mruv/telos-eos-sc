@@ -222,17 +222,34 @@ namespace SmtsBusiness {
 			std::make_tuple(
 				customerAcct, inv_req.to, (inv_req.unit_price * inv_req.quantity.amount), 
 				std::string{"Inv Req settled"})
-		}.send();UpdateDestAcct
+		}.send();
 
 		invRequests.modify(inv_req, customerAcct, [&](auto& req) {
 			req.status = "PAID";
 		});
 	}
 
-	void SmtsBusiness::UpsertMsl(const name& payer, const asset& commodity) {
+	void SmtsBusiness::UpsertMsl(const name& payer, const asset& supply) {
 
+		eosio_assert(is_account(payer), "to account does not exist");
 		require_auth(payer);
 
+		eosio_assert(supply.is_valid(), "invalid supply" );
+		eosio_assert(supply.amount > 0, "must UpsertMsl positive value" );
+		
+		MinStockLevels msLevels(_self, payer.value);
+		auto existing_msl = msLevels.find(supply.symbol.code().raw());
+
+		// create new
+		if (existing_msl == msLevels.end()) {
+			msLevels.emplace(payer, [&](auto& msLevel) {
+				msLevel.supply = supply;
+			});
+		} else { // update
+			msLevels.modify(existing_msl, payer, [&](auto& msLevel) {
+				msLevel.supply = supply;
+			});
+		}
 	}
 
 	void SmtsBusiness::DeleteData() {
