@@ -3,11 +3,16 @@ const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig')
 const fetch = require('node-fetch')
 const { TextEncoder, TextDecoder } = require('text-encoding')
 
+// Bob's  -- eosyelosbobb
+// and
+// Erik's -- eosyeloserik
+// private keys
 const signatureProvider = new JsSignatureProvider([
     '5JQT9qoFwHq6fi4HmG8x6kdXFKJNGyRN7bz8yRqdbJ3omiaDVKK',
     '5Khg26SQ9F2okyjtJQWW1kVd4jMQeZwTeaAEE4ppFyDVinUA2nr'
 ])
 
+// Telos EOS RPC API 
 const rpc = new JsonRpc('http://testnet.theteloscope.io:18888', { fetch })
 const api = new Api(
     {
@@ -18,29 +23,41 @@ const api = new Api(
     })
 
 module.exports = {
-    transact: (actor, action, data) => {
 
-        return api.transact(
-            {
-                actions: [
-                    {
-                        account: 'eosyelosbobb', // smart contract owner
-                        name: action,
-                        authorization: [
-                            { actor: actor, permission: 'active', }
-                        ],
-                        data: data,
-                    }]
-            },
-            {
-                blocksBehind: 3,
-                expireSeconds: 30,
-            })
+    // CLEOS PUSH ACTION CONTRACT_ACCT='eosyelosbobb' ACTION=action DATA=data PERMISSION='actor@active'
+    // 
+    transact: async (actor, action, data) => {
+
+        try {
+            const resData = await api.transact(
+                {
+                    actions: [
+                        {
+                            account: 'eosyelosbobb', // smart contract owner
+                            name: action,
+                            authorization: [
+                                { actor: actor, permission: 'active', }
+                            ],
+                            data: data,
+                        }]
+                },
+                {
+                    blocksBehind: 3,
+                    expireSeconds: 30,
+                })
+            return { code: 200, resData: resData }
+        } catch (error) {
+            return {code: 500}
+        }
     },
 
-    info: async (account) => await rpc.get_account(account),
+    // CLEOS GET ACCOUNT NAME=account
+    //
+    info: (account) => rpc.get_account(account),
 
-    getInventoryReqs: async () => await rpc.get_table_rows({
+    // CLEOS GET TABLE ACCOUNT='eosyelosbobb' SCOPE='eosyelosbobb' TABLE='inventreqs' LIMIT=100
+    //
+    getInventoryReqs: () => rpc.get_table_rows({
         json: true,
         code: 'eosyelosbobb',
         scope: 'eosyelosbobb',
@@ -50,5 +67,7 @@ module.exports = {
         show_payer: false,
     }),
 
-    getCurrencyBal: async (account, symbol) => await rpc.get_currency_balance("eosyelosbobb", account, symbol)
+    // CLEOS GET CURRENCY BALANCE CONTRACT_ACCT='eosyelosbobb' ACCOUNT=account SYMBOL=symbol
+    //
+    getCurrencyBal: (account, symbol) => rpc.get_currency_balance("eosyelosbobb", account, symbol)
 }

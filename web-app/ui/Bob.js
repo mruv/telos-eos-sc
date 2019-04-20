@@ -17,7 +17,7 @@ export default class Bob extends React.Component {
 
         e.persist()
         const value = e.target.value
-        this.setState((state) => { return {sellIron: value}})
+        this.setState((state) => { return { sellIron: value } })
     }
 
     render() {
@@ -40,6 +40,19 @@ export default class Bob extends React.Component {
                 </Card.Body>
                 <Card.Header>Commodities</Card.Header>
                 <Card.Body>
+                    <p>
+                        To trigger an Inventory Request, try and sell some pounds of IRON so that the balance falls below 20.0 IRON.
+                        The automatic Inventory Request send is for 50.0 IRON (50.0 lbs of iron). To Fulfill the Request, go to Erik's tab and click 'Fulfill'.
+                        After that, a new button for 'Pay' appears on the Bob's side which once clicked settles the debt by send some YELOS to Erik.
+                         </p>
+                    <p>
+                        An Inventory Request goes through 3 stages --> REQ (By Bob) -> PENDING (By Bob) -> FULFILLED (By Erik) -> PAID (By Bob).
+                    </p>
+                    <p>
+                        Everytime a Request is updated (requested, fulfilled or paid), the balances (YELOS and IRON) are updated to reflect the change.
+                    </p>
+                    <p>For more info about the smart contract go <a href="https://mon-test.telosfoundation.io/account/eosyelosbobb">here.</a></p>
+
                     <ListGroup>
                         <ListGroup.Item>
                             <Row>
@@ -50,19 +63,19 @@ export default class Bob extends React.Component {
                                             size="sm" value={this.state.sellIron} type="text"
                                             placeholder="Simulate Stock Sale"
                                             onChange={this.handleChange} />
-                                        <Button 
-                                        variant="outline-primary" size="sm"
-                                        onClick={(e) => {
-                                            e.persist()
-                                            onPushAction({
-                                                actor: name,
-                                                action: "sell",
-                                                data: {
-                                                    payer: name,
-                                                    quantity: parseFloat(this.state.sellIron).toFixed(1) + ' IRON'
-                                                }
-                                            })
-                                        }}>Sell</Button>
+                                        <Button
+                                            variant="outline-primary" size="sm"
+                                            onClick={(e) => {
+                                                e.persist()
+                                                onPushAction({
+                                                    actor: name,
+                                                    action: "sell",
+                                                    data: {
+                                                        payer: name,
+                                                        quantity: parseFloat(this.state.sellIron).toFixed(1) + ' IRON'
+                                                    }
+                                                })
+                                            }}>Sell</Button>
                                     </Form>
                                 </Col>
                             </Row>
@@ -79,9 +92,7 @@ export default class Bob extends React.Component {
                                     <Col>Quantity <i>(lbs)</i></Col>
                                     <Col>Price</Col>
                                     <Col>Status</Col>
-                                    <Col>
-                                        <Button variant="outline-primary" size="sm">New</Button>
-                                    </Col>
+                                    <Col></Col>
                                 </Row>
                             </ListGroup.Item>
                             {
@@ -120,7 +131,7 @@ export default class Bob extends React.Component {
                         </ListGroup>
                     </Container>
                 </Card.Body>
-            </Card>
+            </Card >
         )
     }
 }

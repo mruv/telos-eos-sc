@@ -5,6 +5,7 @@ const teloseosapi = require('./teloseosapi')
 const app = express()
 const port = 3000
 
+// config
 app.set('views', __dirname);
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
@@ -12,12 +13,15 @@ app.use(express.static('resources'))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
+// Routes
 app.get('/', (req, res) => res.render('index.html'))
 
+// get basic user info -- RAM, BANDWIDTH, TLOS balance, ...
 app.get('/info', async (req, res) => {
 
-    const bob = await  teloseosapi.info('eosyelosbobb')
-    const erik = await  teloseosapi.info('eosyeloserik')
+    const bob = await teloseosapi.info('eosyelosbobb')
+    const erik = await teloseosapi.info('eosyeloserik')
 
     res.json(
         {
@@ -32,10 +36,12 @@ app.get('/info', async (req, res) => {
         })
 })
 
+// get a list of Inventory Requests
 app.get('/invreqs', async (req, res) => {
     res.json((await teloseosapi.getInventoryReqs()).rows)
 })
 
+// get currency balance for a token asset -- YELOS or IRON
 app.get('/assets_bal', async (req, res) => {
 
     const bob_y = await teloseosapi.getCurrencyBal('eosyelosbobb', 'YELOS')
@@ -49,10 +55,13 @@ app.get('/assets_bal', async (req, res) => {
     })
 })
 
+// push an action
 app.post('/transact', async (req, res) => {
     // console.log(req.body)
     const {actor, action, data} = req.body
-    res.json(await teloseosapi.transact(actor, action, data))
+    const {code, resData} = await teloseosapi.transact(actor, action, data)
+    res.status(code).json(resData)
 })
 
+// start web app
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Navbar, Dropdown } from 'react-bootstrap'
+import { Navbar } from 'react-bootstrap'
 
 export default class NavBar extends React.Component {
   constructor(props) { super(props) }

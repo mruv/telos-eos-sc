@@ -36,7 +36,7 @@ export default class Erik extends React.Component {
                         <ListGroup>
                             <ListGroup.Item key={1000}>
                                 <Row style={{ color: 'teal' }}>
-                                    <Col>To</Col>
+                                    <Col>From</Col>
                                     <Col>Quantity <i>(lbs)</i></Col>
                                     <Col>Price</Col>
                                     <Col>Status</Col>

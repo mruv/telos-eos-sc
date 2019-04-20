@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tabs, Tab, Container, Spinner } from 'react-bootstrap';
+import { Tabs, Tab, Container, Spinner, Alert } from 'react-bootstrap';
 import Bob from './Bob';
 import Erik from './Erik';
 import Axios from 'axios';
@@ -10,6 +10,7 @@ export default class Main extends React.Component {
 
         this.state = {
             isLoading: true,
+            alert: { show: false, isSuccess: false },
             bob: { name: '', tlos: '', ylos: '', iron: '' },
             erik: { name: '', tlos: '', ylos: '', iron: '' }
         }
@@ -19,6 +20,8 @@ export default class Main extends React.Component {
         this.fetchInfo = this.fetchInfo.bind(this)
         this.handlePushActionOver = this.handlePushActionOver.bind(this)
         this.pushAction = this.pushAction.bind(this)
+        this.handleAlertClose = this.handleAlertClose.bind(this)
+        this.handleHttp5xx = this.handleHttp5xx.bind(this)
     }
 
     componentDidMount() {
@@ -29,6 +32,7 @@ export default class Main extends React.Component {
 
     fetchInfo() {
         Axios.get("/info").then((res) => {
+            // console.log(res)
             this.setState((state) => {
                 const bob_e = state.bob
                 const erik_e = state.erik
@@ -85,25 +89,51 @@ export default class Main extends React.Component {
     }
 
     handlePushActionOver(res) {
+
         this.setState((state) => {
-            return {isLoading: true}
+            return {
+                isLoading: true,
+                alert: { show: true, isSuccess: true }
+            }
         })
+
         this.fetchInfo()
         this.fetchInvReqs()
         this.fetchYelosBal()
     }
 
     pushAction(conf) {
-        console.log(conf)
-        Axios.post('/transact', conf).then(this.handlePushActionOver)
+        Axios.post('/transact', conf)
+            .then(this.handlePushActionOver)
+            .catch(this.handleHttp5xx)
+    }
+
+    handleHttp5xx(err) {
+        this.setState((state) => {
+            return { alert: { show: true, isSuccess: false } }
+        })
+    }
+
+    handleAlertClose(e) {
+        this.setState((state) => {
+            return { alert: { show: false, isSuccess: true } }
+        })
     }
 
     render() {
-        const { bob, erik, isLoading, invReqs } = this.state
+        const { bob, erik, isLoading, invReqs, alert } = this.state
 
         const view = isLoading ?
             <Spinner animation="grow" /> : (
                 <Container style={{ marginTop: '20px' }}>
+                    {
+                        alert.show &&
+                        <Alert onClose={this.handleAlertClose}
+                            dismissible variant={alert.isSuccess ? "success" : "danger"}> {
+                                alert.isSuccess ? "Request successfully processed" : "Request could not be processed"}
+                        </Alert>
+                    }
+
                     <Tabs defaultActiveKey="bob">
                         <Tab eventKey="bob" title="Bob">
                             <Bob {...bob} invReqs={invReqs} onPushAction={this.pushAction} />
